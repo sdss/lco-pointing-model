@@ -1,0 +1,67 @@
+[project]
+name = "sdss-lco-pointing-model"
+version = "0.1.0a0"
+description = "Tools for LCO pointing models"
+authors = [
+    { name = "José Sánchez-Gallego", email = "gallegoj@uw.edu" },
+    { name = "Conor Sayres", email = "csayres@uw.edu" }
+]
+
+license = "BSD-3-Clause"
+readme = "README.md"
+
+requires-python = ">=3.11"
+
+dependencies = [
+    "sdsstools>=1.9.1",
+    "sdss-clu>=2.2.7",
+    "astropy>=7.0.0",
+    "polars>=1.3.0",
+    "pydantic>=2.8.2"
+]
+
+[project.urls]
+Homepage = "https://github.com/sdss/apo-pointing-model"
+Repository = "https://github.com/sdss/apo-pointing-model"
+
+[project.scripts]
+lco-pointing-model = "lco_pointing_model.__main__:lco_pointing_model"
+
+
+[dependency-groups]
+dev = [
+    "ipython>=8.0.0",
+    "ipdb>=0.12.3",
+    "ruff>=0.5.0"
+]
+
+[tool.ruff]
+line-length = 88
+target-version = 'py312'
+exclude = ["typings/"]
+
+[ruff.lint]
+select = ["E", "F", "I"]
+unfixable = ["F841"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "F403", "E402"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["apo_pointing_model"]
+lines-after-imports = 2
+section-order = ["future", "standard-library", "typing", "third-party", "sdss", "first-party", "local-folder"]
+
+[tool.ruff.lint.isort.sections]
+typing = ["typing"]
+sdss = ["sdsstools"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.sdist]
+only-include = ["src/lco_pointing_model"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lco_pointing_model"]
