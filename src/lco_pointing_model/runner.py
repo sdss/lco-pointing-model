@@ -39,6 +39,9 @@ SCHEMA: dict[str, polars.DataTypeClass] = {
     "offset_dec": polars.Float64,
     "offset_rot": polars.Float64,
     "tai_ref": polars.Float64,
+    "ra_tel": polars.String,
+    "dec_tel": polars.String,
+    "st_tel": polars.String
 }
 
 
@@ -278,7 +281,10 @@ async def get_pointing_data(
             pdata.offset_ra = float(astrometry_fit[7])
             pdata.offset_dec = float(astrometry_fit[8])
             pdata.offset_rot = float(astrometry_fit[9])
-            pdata.tai_ref = float(tai0 + exp_time / 2)
+            pdata.tai_ref = float(tai0 + exp_time / 2) # not used?
+            pdata.ra_tel = str(tcs_data[0])
+            pdata.dec_tel = str(tcs_data[1])
+            pdata.st_tel = str(tcs_data[2])
 
             # Override MJD in case the pointing is done at some other point in time
             pdata.mjd = get_sjd("LCO")
