@@ -64,6 +64,9 @@ class PointingDataBase(BaseModel):
     offset_ra: float | None = None
     offset_dec: float | None = None
     offset_rot: float | None = None
+    ra_tel: str | None = None
+    dec_tel: str | None = None
+    st_tel: str | None = None
 
 
 async def query_tcs(waittime=5):
