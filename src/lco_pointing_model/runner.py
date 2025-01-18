@@ -205,7 +205,7 @@ async def get_pointing_data(
             "lcotcc",
             f"target {ra}, {dec} /posAngle=270.0",
             callback=log_reply,
-            time_limit=300,
+            time_limit=600,
         )
         if slew_cmd.status.did_fail:
             log.error("Failed to slew to target. Skipping this pointing.")
