@@ -295,6 +295,8 @@ async def get_pointing_data(
             ### Run ptcorr to get the pointing corrections. ###
 
             log.info("Retrieving pdata.")
+            pdata.done = True
+            break
             # TODO
 
         ### Update data and write to disk. ###
