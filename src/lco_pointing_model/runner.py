@@ -63,6 +63,42 @@ class PointingDataBase(BaseModel):
     offset_rot: float | None = None
 
 
+async def query_tcs(waittime=5):
+    await asyncio.sleep(waittime)
+
+    reader, writer = await asyncio.open_connection(
+        'c100tcs.lco.cl', 4242)
+
+    raCmd = "alp\r\n"
+    writer.write(raCmd.encode())
+    await writer.drain()
+
+    data = await reader.read(100)
+    ra = data.decode().strip()
+
+    decCmd = "del\r\n"
+    writer.write(decCmd.encode())
+    await writer.drain()
+
+    data = await reader.read(100)
+    dec = data.decode().strip()
+
+    stCmd = "st\r\n"
+    writer.write(stCmd.encode())
+    await writer.drain()
+
+    data = await reader.read(100)
+    st = data.decode().strip()
+
+    print(ra)
+    print(dec)
+    print(st)
+
+    writer.close()
+    await writer.wait_closed()
+    return ra, dec, st
+
+
 async def get_pointing_data(
     npoints: int | None,
     output_file: str | pathlib.Path,
@@ -194,11 +230,19 @@ async def get_pointing_data(
             tai0 = 5
             print("hacking tai0", 5)
 
-            cmd_acq = await tron.send_command(
-                "cherno",
-                f"acquire -t {exp_time} --mode astrometrynet --no-continuous --no-apply",
-                callback=log_reply,
+            L = await asyncio.gather(
+                query_tcs(exp_time/2.),
+                tron.send_command(
+                    "cherno",
+                    f"acquire -t {exp_time} --mode astrometrynet --no-continuous --no-apply",
+                    callback=log_reply,
+                )
+
             )
+
+            tcs_data, cmd_acq = L
+
+            print("tcs_data", tcs_data)
 
             did_fail = cmd_acq.status.did_fail
             acquisition_valid = cmd_acq.replies.get("acquisition_valid")[0]
