@@ -69,7 +69,7 @@ async def get_pointing_data(
     reuse_file: bool = True,
     overwrite: bool = False,
     write_csv: bool = True,
-    alt_range: tuple[float, float] = (28, 85),
+    alt_range: tuple[float, float] = (30, 90),
     az_range: tuple[float, float] = (0, 359),
     write_log: bool = True,
 ):
@@ -167,7 +167,7 @@ async def get_pointing_data(
 
         slew_cmd = await tron.send_command(
             "lcotcc",
-            f"target {ra}, {dec} /posAngle=0.0",
+            f"target {ra}, {dec} /posAngle=270.0",
             callback=log_reply,
             time_limit=300,
         )
@@ -180,7 +180,7 @@ async def get_pointing_data(
         log.debug("Setting a fake jaeger field.")
         await tron.send_command(
             "jaeger",
-            f"configuration fake-field {ra} {dec} 0.0",
+            f"configuration fake-field {ra} {dec} 270.0",
         )
 
         ### Solve the field. ###
@@ -189,8 +189,10 @@ async def get_pointing_data(
         exp_time: float = 5
 
         while True:
-            cmd_time = await tron.send_command("tcc", "show time")
-            tai0 = cmd_time.replies.get("tai")[0]
+            # cmd_time = await tron.send_command("tcc", "show time")
+            # tai0 = cmd_time.replies.get("tai")[0]
+            tai0 = 5
+            print("hacking tai0", 5)
 
             cmd_acq = await tron.send_command(
                 "cherno",

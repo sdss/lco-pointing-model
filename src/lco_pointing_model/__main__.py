@@ -65,7 +65,7 @@ def combine(
     "--alt-range",
     nargs=2,
     type=float,
-    default=(28, 85),
+    default=(30, 90),
     show_default=True,
     help="Altitude range.",
 )
