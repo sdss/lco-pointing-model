@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import asyncio
 import pathlib
+from astropy.time import Time
+from datetime import datetime, timezone
 
 import polars
 from clu.legacy import TronConnection
@@ -41,7 +43,8 @@ SCHEMA: dict[str, polars.DataTypeClass] = {
     "tai_ref": polars.Float64,
     "ra_tel": polars.String,
     "dec_tel": polars.String,
-    "st_tel": polars.String
+    "st_tel": polars.String,
+    "ut_date": polars.String
 }
 
 
@@ -67,6 +70,7 @@ class PointingDataBase(BaseModel):
     ra_tel: str | None = None
     dec_tel: str | None = None
     st_tel: str | None = None
+    ut_date: str | None = None
 
 
 async def query_tcs(waittime=5):
@@ -231,13 +235,14 @@ async def get_pointing_data(
         exp_time: float = 5
 
         while True:
-            # cmd_time = await tron.send_command("tcc", "show time")
-            # tai0 = cmd_time.replies.get("tai")[0]
-            tai0 = 5
-            print("hacking tai0", 5)
+            timenow = Time.now()  # utc
+            tai0 = timenow.tai.mjd * 24 * 60 * 60  # secs
+            dt = timenow.to_datetime()
+            utDateStr = "%i %s %s" % (dt.year, str(dt.month).zfill(2), str(dt.day).zfill(2))
+
 
             L = await asyncio.gather(
-                query_tcs(exp_time/2.),
+                query_tcs(exp_time / 2.),
                 tron.send_command(
                     "cherno",
                     f"acquire -t {exp_time} --mode astrometrynet --no-continuous --no-apply",
@@ -284,10 +289,11 @@ async def get_pointing_data(
             pdata.offset_ra = float(astrometry_fit[7])
             pdata.offset_dec = float(astrometry_fit[8])
             pdata.offset_rot = float(astrometry_fit[9])
-            pdata.tai_ref = float(tai0 + exp_time / 2) # not used?
+            pdata.tai_ref = float(tai0 + exp_time / 2)
             pdata.ra_tel = str(tcs_data[0])
             pdata.dec_tel = str(tcs_data[1])
             pdata.st_tel = str(tcs_data[2])
+            pdata.ut_date = utDateStr
 
             # Override MJD in case the pointing is done at some other point in time
             pdata.mjd = get_sjd("LCO")

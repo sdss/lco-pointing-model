@@ -14,20 +14,29 @@ import polars
 def getTpointHeader():
     """Returns list of lines to include in TPOINT header"""
     currDateStr = datetime.datetime.now().isoformat()
+    # header = [
+    #     "! Caption record:",
+    #     "SDSS APO 2.5m Pointing Data " + currDateStr,
+    #     "! Option record: ALTAZ followed by rotator code, if applicable",
+    #     ": ALTAZ",
+    #     "! Run parameters: telescope latitude deg min sec",
+    #     "32 46 49.3",
+    #     "! Pointing data (TPOINT format #4):",
+    #     "!",
+    #     "! All angles are in degrees",
+    #     "! Azimuth uses the convention: N=0, E=90 (unlike the TCC, which uses S=0, E=90)",
+    #     "!",
+    #     "!  Desired Phys            Actual Mount          Rot Phys",
+    #     "! Az          Alt         Az          Alt",
+    # ]
     header = [
-        "! Caption record:",
-        "SDSS APO 2.5m Pointing Data " + currDateStr,
-        "! Option record: ALTAZ followed by rotator code, if applicable",
-        ": ALTAZ",
-        "! Run parameters: telescope latitude deg min sec",
-        "32 46 49.3",
-        "! Pointing data (TPOINT format #4):",
-        "!",
-        "! All angles are in degrees",
-        "! Azimuth uses the convention: N=0, E=90 (unlike the TCC, which uses S=0, E=90)",
-        "!",
-        "!  Desired Phys            Actual Mount          Rot Phys",
-        "! Az          Alt         Az          Alt",
+        "duPont " + currDateStr,
+        ": J2000",
+        ": EQUAT",
+        ": NODA",
+        ": ALLSKY",
+        "! Latitude, UTC date, temp, pressure, height in m, relative humidity",
+        "-29 00 26.8 2019 07 15 13  777  2282.0 0.06",
     ]
     return header
 
@@ -75,3 +84,6 @@ def processFiles(fileInputList, fileOutput):
     with open(fileOutput, "w") as f:
         for line in fileLines:
             f.write(line + "\n")
+
+if __name__ == "__main__":
+    processFiles(["../../out.csv"], "../../fout.csv")
