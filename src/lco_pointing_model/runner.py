@@ -79,6 +79,11 @@ async def query_tcs(waittime=5):
     reader, writer = await asyncio.open_connection(
         'c100tcs.lco.cl', 4242)
 
+    offCmd = "TP OFF\r\n"
+    writer.write(offCmd.encode())
+    await writer.drain()
+    junk = await reader.read(100)
+
     raCmd = "alp\r\n"
     writer.write(raCmd.encode())
     await writer.drain()
@@ -100,9 +105,15 @@ async def query_tcs(waittime=5):
     data = await reader.read(100)
     st = data.decode().strip()
 
-    print(ra)
-    print(dec)
-    print(st)
+
+    offCmd = "TP ON\r\n"
+    writer.write(offCmd.encode())
+    await writer.drain()
+    junk = await reader.read(100)
+
+    # print(ra)
+    # print(dec)
+    # print(st)
 
     writer.close()
     await writer.wait_closed()
@@ -253,7 +264,7 @@ async def get_pointing_data(
 
             tcs_data, cmd_acq = L
 
-            print("tcs_data", tcs_data)
+            # print("tcs_data", tcs_data)
 
             did_fail = cmd_acq.status.did_fail
             acquisition_valid = cmd_acq.replies.get("acquisition_valid")[0]
