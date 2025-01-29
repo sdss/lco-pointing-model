@@ -89,6 +89,11 @@ def combine(
     is_flag=True,
     help="Overwrites the output file if it exists.",
 )
+@click.option(
+    "--equator",
+    is_flag=True,
+    help="Samples a few points along the equator.",
+)
 @cli_coro()
 async def collect(
     n_points: int | None,
@@ -98,6 +103,7 @@ async def collect(
     verbose: bool = False,
     reuse: bool = True,
     overwrite: bool = False,
+    equator: bool = False,
 ):
     """Collects pointing model data."""
 
@@ -122,4 +128,5 @@ async def collect(
         az_range=az_range,
         reuse_file=reuse,
         overwrite=overwrite,
+        equator=equator,
     )

@@ -21,7 +21,7 @@ from pydantic import BaseModel, Field, create_model
 from sdsstools import get_sjd
 
 from lco_pointing_model import log
-from lco_pointing_model.sample import get_random_sample, to_icrs
+from lco_pointing_model.sample import get_random_sample, to_icrs, get_equator_sample
 
 
 SCHEMA: dict[str, polars.DataTypeClass] = {
@@ -125,6 +125,7 @@ async def get_pointing_data(
     output_file: str | pathlib.Path,
     reuse_file: bool = True,
     overwrite: bool = False,
+    equator: bool = False,
     write_csv: bool = True,
     alt_range: tuple[float, float] = (30, 90),
     az_range: tuple[float, float] = (0, 359),
@@ -145,6 +146,8 @@ async def get_pointing_data(
         If False and the file exists, it will raise an error unless ``overwrite=True``.
     overwrite
         If True, overwrites the output file if it exists.
+    equator
+        If True generate a small line of points along the equator (a la povilas)
     write_csv
         If True, writes the output to a CSV file as well.
     alt_range
@@ -182,11 +185,17 @@ async def get_pointing_data(
         if output_file.exists() and overwrite is False:
             raise FileExistsError("output_file exists and overwrite=False.")
 
-        if npoints is None:
-            raise ValueError("npoints is required if output_file does not exist.")
+        if equator:
+            ## get a grid on points along the equator, ignoring npoints option
+            log.info("Generating povilas test points.")
+            altaz = get_equator_sample()
+        else:
+            if npoints is None:
+                raise ValueError("npoints is required if output_file does not exist.")
 
-        log.info("Generating new pointing model grid.")
-        altaz = get_random_sample(npoints, alt_range=alt_range, az_range=az_range)
+            log.info("Generating new pointing model grid.")
+            altaz = get_random_sample(npoints, alt_range=alt_range, az_range=az_range)
+
         data: list[PointingDataBase] = []
         for alt, az in altaz:
             data.append(PointingData(alt=alt, az=az, rot=0.0))

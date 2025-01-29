@@ -12,6 +12,7 @@ import numpy
 from astropy import units as uu
 from astropy.coordinates import (
     AltAz,
+    HADec,
     EarthLocation,
     SkyCoord,
     uniform_spherical_random_surface,
@@ -78,6 +79,34 @@ def get_random_sample(
 
         if points.shape[0] >= n_points:
             return points[0:n_points, :]
+
+
+def get_equator_sample():
+    """
+
+    Returns
+    -------
+    coordinates
+        A 2D array with the Alt/Az coordinates of the points along
+        the equator.
+
+    """
+
+    points = numpy.zeros((0, 2), dtype=numpy.float64)
+
+    lco = EarthLocation.of_site("Las Campanas Observatory")
+    now = Time.now()
+
+    aa = AltAz(location=lco, obstime=now)
+    haDec = HADec(
+        ha=numpy.array([-4, -2, 0, 2, 4])*15.0*uu.deg,
+        dec=numpy.array([0, 0, 0, 0, 0])*uu.deg,
+        location=lco,
+        obstime=now
+    )
+
+    out = haDec.transform_to(aa)
+    return numpy.array([out.alt.deg, out.az.deg], dtype=numpy.float64).T
 
 
 def to_icrs(alta: float, az: float) -> SkyCoord:
