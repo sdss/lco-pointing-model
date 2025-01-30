@@ -92,15 +92,13 @@ def get_equator_sample():
 
     """
 
-    points = numpy.zeros((0, 2), dtype=numpy.float64)
-
     lco = EarthLocation.of_site("Las Campanas Observatory")
     now = Time.now()
 
     aa = AltAz(location=lco, obstime=now)
     haDec = HADec(
-        ha=numpy.array([-4, -2, 0, 2, 4])*15.0*uu.deg,
-        dec=numpy.array([0, 0, 0, 0, 0])*uu.deg,
+        ha=numpy.array([-4, -2, 0, 2, 4]) * 15.0 * uu.deg,
+        dec=numpy.array([0, 0, 0, 0, 0]) * uu.deg,
         location=lco,
         obstime=now
     )
