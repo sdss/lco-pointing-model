@@ -63,7 +63,7 @@ def processFiles(fileInputList, fileOutput):
     nGood = len(df)
     print("using %i of %i pointings" % (nGood, nMeas))
 
-    sky_coords = SkyCoord(df["ra_bore"], df["dec_bore"], frame="icrs", unit="deg")
+    sky_coords = SkyCoord(df["ra_bore"].to_numpy(), df["dec_bore"].to_numpy(), frame="icrs", unit="deg")
     sky_coords = sky_coords.to_string("hmsdms", sep=" ")
     ppm1 = [0]*len(sky_coords)
     ppm2 = [0]*len(sky_coords)
