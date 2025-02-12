@@ -44,7 +44,9 @@ SCHEMA: dict[str, polars.DataTypeClass] = {
     "ra_tel": polars.String,
     "dec_tel": polars.String,
     "st_tel": polars.String,
-    "ut_date": polars.String
+    "ut_date": polars.String,
+    "ra_tel_tp": polars.String,
+    "dec_tel_tp": polars.String
 }
 
 
@@ -71,6 +73,8 @@ class PointingDataBase(BaseModel):
     dec_tel: str | None = None
     st_tel: str | None = None
     ut_date: str | None = None
+    ra_tel_tp: str | None = None
+    dec_tel_tp: str | None = None
 
 
 async def query_tcs(waittime=5):
@@ -111,13 +115,27 @@ async def query_tcs(waittime=5):
     await writer.drain()
     junk = await reader.read(100)
 
+    raCmd = "alp\r\n"
+    writer.write(raCmd.encode())
+    await writer.drain()
+
+    data = await reader.read(100)
+    ra_tp = data.decode().strip()
+
+    decCmd = "del\r\n"
+    writer.write(decCmd.encode())
+    await writer.drain()
+
+    data = await reader.read(100)
+    dec_tp = data.decode().strip()
+
     # print(ra)
     # print(dec)
     # print(st)
 
     writer.close()
     await writer.wait_closed()
-    return ra, dec, st
+    return ra, dec, st, ra_tp, dec_tp
 
 
 async def get_pointing_data(
@@ -314,6 +332,8 @@ async def get_pointing_data(
             pdata.dec_tel = str(tcs_data[1])
             pdata.st_tel = str(tcs_data[2])
             pdata.ut_date = utDateStr
+            pdata.ra_tel_tp = str(tcs_data[3])
+            pdata.dec_tel_tp = str(tcs_data[4])
 
             # Override MJD in case the pointing is done at some other point in time
             pdata.mjd = get_sjd("LCO")
