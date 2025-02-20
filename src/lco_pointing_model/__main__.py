@@ -36,9 +36,15 @@ def lco_pointing_model():
     multiple=False,
     type=click.Path(dir_okay=False),
 )
+@click.option(
+    "--tp-on",
+    is_flag=True,
+    help="Build output file using TPOINT=ON telescope coordinates.",
+)
 def combine(
     input: list,
     output: str,
+    tp_on: bool = False,
 ):
     """
     Combine pointing data collection file(s) into file formatted for TPOINT
@@ -53,7 +59,7 @@ def combine(
         print("must supply a path for tpoint-formatted output file")
         return
 
-    processFiles(input, output)
+    processFiles(input, output, tp_on)
 
 
 @lco_pointing_model.command()

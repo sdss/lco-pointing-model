@@ -44,7 +44,7 @@ def getTpointHeader(utcDateStr):
     return header
 
 
-def processFiles(fileInputList, fileOutput):
+def processFiles(fileInputList, fileOutput, tpointOn=False):
     """Get a TPOINT formatted file from one or more pointing data csv files
 
     Inputs:
@@ -68,9 +68,14 @@ def processFiles(fileInputList, fileOutput):
     ppm1 = [0]*len(sky_coords)
     ppm2 = [0]*len(sky_coords)
     epoch = [2000.0]*len(sky_coords)
-    RA_tel = df["ra_tel"]
+    if tpointOn:
+        RA_tel = df["ra_tel_tp"]
+        Dec_tel = df["dec_tel_tp"]
+    else:
+        RA_tel = df["ra_tel"]
+        Dec_tel = df["dec_tel"]
+
     RA_tel = [x.replace(":", " ") for x in RA_tel]
-    Dec_tel = df["dec_tel"]
     Dec_tel = [x.replace(":", " ") for x in Dec_tel]
     ST_tel = []
     for st in df["st_tel"]:
@@ -104,4 +109,4 @@ def processFiles(fileInputList, fileOutput):
             f.write(line + "\n")
 
 # if __name__ == "__main__":
-#     processFiles(["../../MJD60697.csv", "../../MJD60697_2.csv"], "../../FPS_pt_data.dat")
+#     processFiles(["../../mjd60723.csv"], "../../mjd60723_tpoint_on.dat")
